@@ -1,0 +1,51 @@
+#!/bin/bash
+
+get_help() {
+	echo "tex3pdf [options] [-f FILENAME] [-o OUTPUT]"
+	echo "-h	get this help"
+	echo "-f 	specify input tex file, default is main.tex"
+	echo "-o	specify output pdf file, default is document.pdf"
+}
+
+while getopts "hf:o:" flag; do
+	case $flag in
+		h)
+			get_help
+			exit
+			;;
+		f)
+			filename=$OPTARG
+			;;
+		o)
+			outname=$OPTARG
+			;;
+	esac
+done
+
+# create .tex if needed
+if [[ ! -d ".tex" ]]; then
+	mkdir .tex
+fi
+
+# compile .tex into pdf with bibtex references
+if [[ -z $filename ]]; then
+	pdflatex main.tex
+	bibtex main.aux
+	pdflatex main.tex
+	pdflatex main.tex
+else
+	pdflatex "$filename".tex
+	bibtex "$filename".aux
+	pdflatex "$filename".tex
+	pdflatex "$filename".tex
+fi
+
+# get these out of sight
+mv *toc *aux *blg *bbl *log .tex
+
+# rename pdf
+if [[ -z $outname ]]; then
+	mv main.pdf document.pdf
+else
+	mv main.pdf "$outname".pdf
+fi
