@@ -7,6 +7,9 @@ get_help() {
 	echo "-o	specify output pdf file, default is document.pdf"
 }
 
+filename=main.tex
+outname=document.pdf
+
 while getopts "hf:o:" flag; do
 	case $flag in
 		h)
@@ -22,30 +25,21 @@ while getopts "hf:o:" flag; do
 	esac
 done
 
-# create .tex if needed
+# create .tex directory if needed
 if [[ ! -d ".tex" ]]; then
 	mkdir .tex
 fi
 
 # compile .tex into pdf with bibtex references
-if [[ -z $filename ]]; then
-	pdflatex main.tex
-	bibtex main.aux
-	pdflatex main.tex
-	pdflatex main.tex
-else
-	pdflatex "$filename".tex
-	bibtex "$filename".aux
-	pdflatex "$filename".tex
-	pdflatex "$filename".tex
-fi
+pdflatex $filename
+bibtex $filename
+pdflatex $filename
+pdflatex $filename
 
 # get these out of sight
-mv *toc *aux *blg *bbl *log .tex
+#rsync -a --files-from=.hide.list . .tex
+mv *aux *log *toc *nav *out *snm *vrb .tex
+
 
 # rename pdf
-if [[ -z $outname ]]; then
-	mv main.pdf document.pdf
-else
-	mv main.pdf "$outname".pdf
-fi
+mv *.pdf $outname
