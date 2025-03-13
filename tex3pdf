@@ -5,23 +5,22 @@ get_help() {
 	echo "-h	get this help"
 	echo "-f 	specify input tex file, default is main.tex"
 	echo "-o	specify output pdf file, default is document.pdf"
+	echo "-b	use when you tex file includes references from a bib file"
 }
 
 filename=main.tex
 outname=document.pdf
+bibtex=false
 
-while getopts "hf:o:" flag; do
+while getopts ":hf:o:b" flag; do
 	case $flag in
-		h)
-			get_help
-			exit
-			;;
-		f)
-			filename=$OPTARG
-			;;
-		o)
-			outname=$OPTARG
-			;;
+		h) get_help; exit ;;
+		f) filename=$OPTARG ;;
+		o) outname=$OPTARG ;;
+		b) bibtex=true ;;
+		:) >&2 echo "Invalid option: $OPTARG requires an argument"; exit ;;
+		*) >&2 echo "Invalid option: -$OPTARG"; exit ;;
+		?) >&2 echo "Invalid option: unknown option -$OPTARG"; exit ;;
 	esac
 done
 
@@ -31,10 +30,15 @@ if [[ ! -d ".tex" ]]; then
 fi
 
 # compile .tex into pdf with bibtex references
-pdflatex $filename
-bibtex $filename
-pdflatex $filename
-pdflatex $filename
+if [[ $bibtex ]]; then
+	pdflatex $filename
+	bibtex $filename
+	pdflatex $filename
+	pdflatex $filename
+else
+	pdflatex $filename
+	pdflatex $filename
+fi
 
 # get these out of sight
 #rsync -a --files-from=.hide.list . .tex
