@@ -48,7 +48,7 @@ else
 fi
 
 # get these out of sight
-mv *aux *log *toc *nav *out *snm *vrb .tex
+mv *aux *log *toc *nav *out *snm *vrb *bbl *blg .tex
 
 # rename pdf
 mv *.pdf ${outname}.pdf
