@@ -12,3 +12,6 @@ tex3pdf [options] [-f FILENAME] [-o OUTPUT]
 -b      use when you tex file includes references from a bib file
 -c      get bib citation keys in alphabetic order, needs path to bib file
 ```
+
+# Dependencies
+cut, sed, grep, pdflatex, bibtex, ...
