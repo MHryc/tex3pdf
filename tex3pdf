@@ -6,18 +6,24 @@ get_help() {
 	echo "-f 	specify input tex file, default is main.tex"
 	echo "-o	specify output pdf file, default is document.pdf"
 	echo "-b	use when you tex file includes references from a bib file"
+	echo "-c	get bib citation keys in alphabetic order, needs path to bib file"
+}
+# get citationkey from bib file
+get_citkey() {
+	grep "@" $1 | cut -d '{' -f 2 | sort
 }
 
 filename=main
 outname=document
 bibtex=0
 
-while getopts ":hf:o:b" flag; do
+while getopts ":hf:o:bc:" flag; do
 	case $flag in
 		h) get_help; exit ;;
 		f) filename=$(sed 's/\.tex//g' <<< $OPTARG) ;;
 		o) outname=$OPTARG ;;
 		b) bibtex=1 ;;
+		c) get_citkey $OPTARG; exit ;;
 		:) >&2 echo "Invalid option: $OPTARG requires an argument";
 			get_help; exit ;;
 		*) >&2 echo "Invalid option: -$OPTARG";
@@ -43,7 +49,6 @@ fi
 
 # get these out of sight
 mv *aux *log *toc *nav *out *snm *vrb .tex
-
 
 # rename pdf
 mv *.pdf ${outname}.pdf
