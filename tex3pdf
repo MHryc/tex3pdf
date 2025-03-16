@@ -8,19 +8,21 @@ get_help() {
 	echo "-b	use when you tex file includes references from a bib file"
 }
 
-filename=main.tex
-outname=document.pdf
-bibtex=false
+filename=main
+outname=document
+bibtex=0
 
 while getopts ":hf:o:b" flag; do
 	case $flag in
 		h) get_help; exit ;;
 		f) filename=$OPTARG ;;
 		o) outname=$OPTARG ;;
-		b) bibtex=true ;;
-		:) >&2 echo "Invalid option: $OPTARG requires an argument"; exit ;;
-		*) >&2 echo "Invalid option: -$OPTARG"; exit ;;
-		?) >&2 echo "Invalid option: unknown option -$OPTARG"; exit ;;
+		b) bibtex=1 ;;
+		:) >&2 echo "Invalid option: $OPTARG requires an argument";
+			get_help; exit ;;
+		*) >&2 echo "Invalid option: -$OPTARG";
+			get_help; exit ;;
+		#?) >&2 echo "Invalid option: unknown option -$OPTARG"; exit ;;
 	esac
 done
 
@@ -30,14 +32,13 @@ if [[ ! -d ".tex" ]]; then
 fi
 
 # compile .tex into pdf with bibtex references
-if [[ $bibtex ]]; then
-	pdflatex $filename
-	bibtex $filename
-	pdflatex $filename
-	pdflatex $filename
+if [[ $bibtex -eq 0 ]]; then
+	pdflatex ${filename}.tex
+	bibtex ${filename}.aux
+	pdflatex ${filename}.tex
 else
-	pdflatex $filename
-	pdflatex $filename
+	pdflatex ${filename}.tex
+	pdflatex ${filename}.tex
 fi
 
 # get these out of sight
@@ -46,4 +47,4 @@ mv *aux *log *toc *nav *out *snm *vrb .tex
 
 
 # rename pdf
-mv *.pdf $outname
+mv *.pdf ${outname}.pdf
