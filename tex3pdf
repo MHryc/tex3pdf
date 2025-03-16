@@ -15,7 +15,7 @@ bibtex=0
 while getopts ":hf:o:b" flag; do
 	case $flag in
 		h) get_help; exit ;;
-		f) filename=$OPTARG ;;
+		f) filename=$(sed 's/\.tex//g' <<< $OPTARG) ;;
 		o) outname=$OPTARG ;;
 		b) bibtex=1 ;;
 		:) >&2 echo "Invalid option: $OPTARG requires an argument";
@@ -42,7 +42,6 @@ else
 fi
 
 # get these out of sight
-#rsync -a --files-from=.hide.list . .tex
 mv *aux *log *toc *nav *out *snm *vrb .tex
 
 
